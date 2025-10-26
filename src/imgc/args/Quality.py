@@ -1,4 +1,4 @@
-from imgc.args import Arg
+from .Arg import Arg
 
 class Quality(Arg):
     name = 'quality'
@@ -20,7 +20,7 @@ class Quality(Arg):
             if (parsed_value < 0 or parsed_value > 100):
                 raise ValueError
             
-            main_config['quality'] = parsed_value
+            main_config[self.name] = parsed_value
 
         except ValueError:
             raise Arg.Error(

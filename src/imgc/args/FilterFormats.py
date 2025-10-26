@@ -1,4 +1,5 @@
-from imgc.args import Arg
+from .Arg import Arg
+from imgc.lib import Consts
 
 class FilterFormats(Arg):
     name = 'filter-formats'
@@ -15,12 +16,12 @@ class FilterFormats(Arg):
             raise Arg.Error(f'{self.name} needs a value to know what to filter.')
 
         formats = arg_value.split(',') if arg_value else []
-        valid_formats = set([ 'png', 'jpg', 'jpeg', 'webp' ])
+        valid_formats = Consts.allowed_formats
 
         for raw_format in formats:
             # Return all comands
             if raw_format == '*':
-                main_config['filter_formats'] = valid_formats
+                main_config[self.name] = valid_formats
                 return
 
             # Remove a possible leading dot
@@ -30,4 +31,4 @@ class FilterFormats(Arg):
             if raw_format not in valid_formats:
                 raise Arg.Error(f'Invalid format used in {self.name}. {self.dumpRecieved(raw_format)}')
 
-        main_config['filter_formats'] = set(formats)
+        main_config[self.name] = set(formats)

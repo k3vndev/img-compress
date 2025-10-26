@@ -3,9 +3,10 @@ import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from imgc.args import Arg, FilterFormats, Quality
+from imgc.lib import compress_imgs
 
 import colorama
-from colorama import Fore, Style
+from colorama import Fore
 
 colorama.init()
 colorama.just_fix_windows_console()
@@ -28,7 +29,7 @@ def setup_config_from_args(main_config, input_args, args_obj_list):
 
         # Find the arg that's being used
         for arg_obj in args_obj_list:
-            if arg_obj.name == input_arg_name:
+            if input_arg_name in [arg_obj.name, arg_obj.alias]:
                 current_arg_obj = arg_obj
                 break
 
@@ -62,9 +63,7 @@ def main():
 
     # Set up config
     setup_config_from_args(main_config, input_args, args_obj_list)
-    print(main_config)
-
-
+    compress_imgs(main_config)
 
 
 if __name__ == "__main__":
