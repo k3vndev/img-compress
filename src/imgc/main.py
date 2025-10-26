@@ -10,7 +10,7 @@ colorama.init()
 colorama.just_fix_windows_console()
 
 
-def handle_args(main_config, input_args, args_obj_list):
+def setup_config_from_args(main_config, input_args, args_obj_list):
     for input_arg in input_args:
         # Split arg name and value
         splitted_arg = input_arg.split(':')
@@ -36,7 +36,6 @@ def handle_args(main_config, input_args, args_obj_list):
             print(f'Unknown argument name provided. Recieved {input_arg_name}')
             break
         
-
         try:
             current_arg_obj.execute(input_arg_value, main_config)
             
@@ -46,6 +45,7 @@ def handle_args(main_config, input_args, args_obj_list):
             print(f"Error: {error}")
             print(f"{Fore.MAGENTA}Example usage: {current_arg_obj.usage}")
             print(Fore.RESET)
+
 
 def main():
     input_args = sys.argv[1:]
@@ -62,7 +62,7 @@ def main():
         ),
     ]
 
-    handle_args(main_config, input_args, args_obj_list)
+    setup_config_from_args(main_config, input_args, args_obj_list)
 
     
 

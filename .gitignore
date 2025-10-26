@@ -8,7 +8,7 @@ wheels/
 
 # Virtual environments
 .venv
-compressed_images
+imgc_output
 
 img1.png
 img2.png
