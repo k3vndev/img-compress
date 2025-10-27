@@ -1,12 +1,38 @@
 from .Consts import Consts
+
 from PIL import Image
 from colorama import Fore
 import os
 
+
 folder = "./"
 
+Name = None
 
-def compress_imgs(config):
+
+def generate_name(config: dict, og_name: str, index: int, files_count: int):
+    # Resolve Name import
+    global Name
+    if Name is None:
+        from imgc.args import Name
+
+    output_name = ""
+
+    # Handle each value
+    name_values = config[Name.name]
+    for value in name_values:
+        if isinstance(value, str):
+            output_name += value
+            continue
+        elif isinstance(value, Name.Original):
+            output_name += og_name
+        elif isinstance(value, Name.Index):
+            output_name += value.generate(index, files_count)
+
+    return output_name
+
+
+def compress_imgs(config: dict):
     from imgc.args import Quality, FilterFormats
 
     quality: int = config[Quality.name]
@@ -53,15 +79,20 @@ def compress_imgs(config):
         # Print message and loading indicator
         loading_ind = spinner[i % len(spinner)]
         progress = f"{Fore.LIGHTGREEN_EX}({i + 1}/{len(to_compress_imgs)}){Fore.RESET}"
+
         msg = f"Compressing {img_filename} {progress} {loading_ind}"
         print(msg.ljust(l_just_val), end="\r", flush=True)
 
         original_img_path = os.path.join(folder, img_filename)
         img_obj = Image.open(original_img_path)
 
-        # Temporarily keep the same name
-        name, _ = os.path.splitext(img_filename)
-        target_img_path = os.path.join(output_folder, f"{name}.{target_format}")
+        # Get target name
+        og_name, _ = os.path.splitext(img_filename)
+        final_name = generate_name(
+            config=config, index=i, og_name=og_name, files_count=len(to_compress_imgs)
+        )
+
+        target_img_path = os.path.join(output_folder, f"{final_name}.{target_format}")
         img_obj.save(target_img_path, target_format.upper(), quality=quality)
 
     print(

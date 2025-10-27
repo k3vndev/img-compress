@@ -16,7 +16,7 @@ class FilterFormats(Arg):
         )
 
     def execute(self, arg_value: str, main_config: dict):
-        if not arg_value:
+        if not self.validateArgValue(arg_value):
             raise Arg.Error(f"{self.name} needs a value to know what to filter.")
 
         formats = arg_value.split(",") if arg_value else []
