@@ -50,7 +50,7 @@ This will compress all the valid images in that folder with default settings to 
 | ------------------ | --------------------------------------------- | ----------------------------- |
 | `filter-formats`   | Compress only from specific image formats     | `filter-formats:png,jpg`      |
 | `format`           | Set the format to compress to                 | `format:webp`                 |
-| `name`             | Set the output name or name sequence          | `name:vacations-{00i}`        |
+| `name`             | Set the output name or name sequence          | `name:vacations-[i]`          |
 | `quality`          | Set the compressed images quality             | `quality:40`                  |
 
 ---

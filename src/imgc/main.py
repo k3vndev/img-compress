@@ -2,7 +2,7 @@ import sys, os
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from imgc.args import Arg, FilterFormats, Quality, Name
+from imgc.args import Arg, FilterFormats, Quality, Name, Format
 from imgc.lib import compress_imgs
 
 import colorama
@@ -58,7 +58,7 @@ def setup_config_from_args(main_config, input_args, args_obj_list):
 
 def main():
     input_args = sys.argv[1:]
-    args_obj_list: list[Arg] = [FilterFormats(), Quality(), Name()]
+    args_obj_list: list[Arg] = [FilterFormats(), Quality(), Name(), Format()]
 
     # Define main config with default values
     main_config = {}

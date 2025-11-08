@@ -20,15 +20,15 @@ class Name(Arg):
             max_i_len = len(str(abs(self.start + (files_count - 1) * self.step)))
             txt = f"{i_str:0{max_i_len}d}" if self.pad else i_str
 
-            return txt
+            return str(txt)
 
     name = "name"
     alias = "n"
     default_value = [Original()]
     description = "Argument used to set the output images name"
-    usage = "name:image-{i} or name:image-{.i0*5}"
+    usage = "name:image-[i] or name:image-[.i0*5]"
 
-    open_tags, close_tags = [set(["[", "<"]), set(["]", ">"])]
+    open_tag, close_tag = ["[", "]"]
 
     def __init__(self):
         super().__init__(
@@ -80,7 +80,7 @@ class Name(Arg):
         # Parse content into chunks and make basic validations
         for i, char in enumerate(arg_value):
             # Handle open tags
-            if char in self.open_tags:
+            if char == self.open_tag:
                 if not opened_a_tag:
                     opened_a_tag = True
 
@@ -97,7 +97,7 @@ class Name(Arg):
             current_chunk += char
 
             # Handle close tags
-            if char in self.close_tags:
+            if char == self.close_tag:
                 if opened_a_tag:
                     opened_a_tag = False
 
@@ -111,7 +111,7 @@ class Name(Arg):
 
             # Handle last char
             if i == len(arg_value) - 1:
-                if opened_a_tag and char not in self.close_tags:
+                if opened_a_tag and char != self.close_tag:
                     raise Arg.Error(
                         f"You never closed the last bracket. {self.dumpRecieved(arg_value)}"
                     )
@@ -126,7 +126,7 @@ class Name(Arg):
             if not chunk:
                 continue
 
-            is_tag = chunk[0] in self.open_tags
+            is_tag = chunk[0] == self.open_tag
 
             # Handle normal text
             if not is_tag:
@@ -219,6 +219,11 @@ class Name(Arg):
 
             start = parse_param(start, "start")
             step = parse_param(step, "step")
+
+            if start and start < 0:
+                raise Arg.Error(
+                    f'Start value cannot be negative at "{i_var_used}" variable.'
+                )
 
             if step == 0:
                 raise Arg.Error(

@@ -7,37 +7,13 @@ import os
 
 folder = "./"
 
-Name = None
-
-
-def generate_name(config: dict, og_name: str, index: int, files_count: int):
-    # Resolve Name import
-    global Name
-    if Name is None:
-        from imgc.args import Name
-
-    output_name = ""
-
-    # Handle each value
-    name_values = config[Name.name]
-    for value in name_values:
-        if isinstance(value, str):
-            output_name += value
-            continue
-        elif isinstance(value, Name.Original):
-            output_name += og_name
-        elif isinstance(value, Name.Index):
-            output_name += value.generate(index, files_count)
-
-    return output_name
-
 
 def compress_imgs(config: dict):
-    from imgc.args import Quality, FilterFormats
+    from imgc.args import Quality, FilterFormats, Format
 
     quality: int = config[Quality.name]
     filter_formats: set[str] = config[FilterFormats.name]
-    target_format = "webp"
+    target_format: str = config[Format.name]
 
     # Add all formats if filter accepts all formats
     accepts_all_formats = list(filter_formats)[0] == "*"
@@ -92,11 +68,60 @@ def compress_imgs(config: dict):
             config=config, index=i, og_name=og_name, files_count=len(to_compress_imgs)
         )
 
+        # Handle target format
+        if target_format == "~":
+            # Keep original format
+            _, raw_ext = os.path.splitext(img_filename)
+            target_format = raw_ext[1:]
+        else:
+            # Handle RGBA to RGB conversion for formats that do not support alpha channel
+            no_alpha_formats = {"jpg", "jpeg", "bmp"}
+
+            if img_obj.mode == "RGBA" and target_format in no_alpha_formats:
+                img_obj = img_obj.convert("RGB")
+
+        # Save compressed image
+        save_format = target_format.upper()
+
+        if save_format == "JPG":
+            save_format = "JPEG"
+
         target_img_path = os.path.join(output_folder, f"{final_name}.{target_format}")
-        img_obj.save(target_img_path, target_format.upper(), quality=quality)
+        img_obj.save(target_img_path, save_format, quality=quality)
 
     print(
         f"Images compressed and saved to {Fore.GREEN}{output_folder}{Fore.RESET}!".ljust(
             l_just_val
         )
     )
+
+
+Name = None
+existing_names: set[str] = set()
+
+
+def generate_name(config: dict, og_name: str, index: int, files_count: int):
+    global Name
+    if Name is None:
+        from imgc.args import Name
+
+    name_values = config[Name.name]
+    used_unique = False
+    output_name = ""
+
+    # Handle each value
+    for value in name_values:
+        if isinstance(value, str):
+            output_name += value
+        elif isinstance(value, Name.Original):
+            output_name += og_name
+            used_unique = True
+        elif isinstance(value, Name.Index):
+            output_name += value.generate(index, files_count)
+            used_unique = True
+
+    # Force index to avoid overwriting files
+    if not used_unique:
+        output_name += f"_{index + 1}"
+
+    return output_name
