@@ -1,11 +1,9 @@
-Perfect, here’s the polished full README with the **pip install** step integrated cleanly into setup 👇
-
----
-
 # 🖼️ IMG Compress
 
 A simple CLI tool to compress images directly from your terminal.
 Just open a terminal in your image folder, type `imgc`, and save some space.
+
+![Showcase of the tool in action, compressing a folder of images with the CLI interface](showcase.webp)
 
 ---
 
